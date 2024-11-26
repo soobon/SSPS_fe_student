@@ -1,18 +1,49 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Row, Col, ListGroup } from "react-bootstrap";
 import { User, Mail, Book, Printer } from "react-feather";
 import StudentHeader from "../../components/common/StudentHeader";
 import Footer from "../../components/common/Footer";
+import apiService from "../../services/api";
 
 const AccountPage = () => {
+  const userId = "012345678";
+
   // Mock user data
-  const user = {
-    name: "Nguyễn Văn A",
-    email: "nguyenvana@example.com",
-    studentId: "1234567",
-    faculty: "Khoa Công nghệ Thông tin",
-    remainingPages: { A4: 100, A3: 50 },
-  };
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    studentId: "",
+    faculty: "",
+    remainingPages: { A4: 0, A3: 0 },
+  });
+
+  useEffect(() => {
+    apiService
+      .getInfo(userId)
+      .then((response) => {
+        console.log(response.data);
+        let newUser = {};
+        newUser.name = response.data.name;
+        newUser.email = response.data.email;
+        newUser.studentId = response.data.id;
+        newUser.faculty = response.data.faculty;
+        setUser(newUser);
+      })
+      .catch((error) => {
+        console.error("Error fetching user data:", error);
+      });
+
+    apiService.getStatistic(userId, 1).then((response) => {
+      console.log(response.data);
+      setUser((prev) => ({
+        ...prev,
+        remainingPages: {
+          A4: response.data.nb_of_page_left,
+          A3: response.data.nb_of_page_left / 2,
+        },
+      }));
+    });
+  }, []);
 
   return (
     <div className="d-flex flex-column min-vh-100">
@@ -69,7 +100,7 @@ const AccountPage = () => {
                         <span>A4</span>
                       </div>
                       <span className="badge bg-primary rounded-pill">
-                        {user.remainingPages.A4} trang
+                        {user.remainingPages?.A4} trang
                       </span>
                     </ListGroup.Item>
                     <ListGroup.Item className="d-flex justify-content-between align-items-center">
@@ -78,7 +109,7 @@ const AccountPage = () => {
                         <span>A3</span>
                       </div>
                       <span className="badge bg-primary rounded-pill">
-                        {user.remainingPages.A3} trang
+                        {user.remainingPages?.A3} trang
                       </span>
                     </ListGroup.Item>
                   </ListGroup>

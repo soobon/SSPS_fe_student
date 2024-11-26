@@ -1,46 +1,85 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Card, Form, Button, ProgressBar, Alert } from "react-bootstrap";
 import { Upload, File, CheckCircle } from "react-feather";
+import apiService from "../../services/api";
 
-const UploadDocument = ({ onFileUpload, onUploadComplete }) => {
+const UploadDocument = () => {
+  const userId = "012345678";
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [uploadComplete, setUploadComplete] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const fileInputRef = useRef(null);
 
-  const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
-    setFile(selectedFile);
-    onFileUpload(selectedFile);
+  // Fallback page count method
+  const getPageCount = async (pdfFile) => {
+    try {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const arrayBuffer = e.target.result;
+          const uint8Array = new Uint8Array(arrayBuffer);
+
+          // Basic PDF page count detection by counting %% markers
+          const pdfContent = new TextDecoder().decode(uint8Array);
+          const pageMatches = pdfContent.match(/\/Type\s*\/Page\b/g);
+
+          resolve(pageMatches ? pageMatches.length : 1);
+        };
+        reader.onerror = (error) => reject(error);
+        reader.readAsArrayBuffer(pdfFile);
+      });
+    } catch (error) {
+      console.error("Page count detection error:", error);
+      return 1; // Default to 1 page if detection fails
+    }
   };
 
-  const handleDrop = (event) => {
-    event.preventDefault();
-    const droppedFile = event.dataTransfer.files[0];
-    setFile(droppedFile);
-    onFileUpload(droppedFile);
-  };
-
-  const handleDragOver = (event) => {
-    event.preventDefault();
-  };
-
-  const handleUpload = () => {
-    if (file) {
-      setUploading(true);
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile && selectedFile.type === "application/pdf") {
+      setFile(selectedFile);
       setUploadComplete(false);
-      // Simulate upload process
-      let uploadProgress = 0;
-      const interval = setInterval(() => {
-        uploadProgress += 10;
-        setProgress(uploadProgress);
-        if (uploadProgress >= 100) {
-          clearInterval(interval);
-          setUploading(false);
-          setUploadComplete(true);
-          onUploadComplete();
-        }
-      }, 500);
+      setErrorMessage("");
+    } else {
+      setErrorMessage("Vui lòng chọn file PDF");
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const selectedFile = e.dataTransfer.files[0];
+    if (selectedFile && selectedFile.type === "application/pdf") {
+      setFile(selectedFile);
+      setUploadComplete(false);
+      setErrorMessage("");
+    } else {
+      setErrorMessage("Vui lòng chọn file PDF");
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleUpload = async () => {
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      const pageCount = await getPageCount(file);
+
+      // Call API to add new file
+      await apiService.addNewFile(userId, file.name, pageCount);
+
+      setProgress(100);
+      setUploadComplete(true);
+      window.location.reload();
+      
+    } catch (error) {
+      setErrorMessage(error.message || "Tải lên thất bại");
+      setUploading(false);
     }
   };
 
@@ -48,9 +87,9 @@ const UploadDocument = ({ onFileUpload, onUploadComplete }) => {
     <Card className="shadow-sm mb-4">
       <Card.Body>
         <div
-          className="text-center p-5 border rounded mb-4"
           onDrop={handleDrop}
           onDragOver={handleDragOver}
+          className="text-center p-5 border rounded mb-4"
           style={{ backgroundColor: "#f8f9fa" }}
         >
           {file ? (
@@ -66,30 +105,26 @@ const UploadDocument = ({ onFileUpload, onUploadComplete }) => {
             </div>
           )}
           <Form.Control
+            ref={fileInputRef}
             type="file"
             onChange={handleFileChange}
             className="d-none"
             id="fileInput"
+            accept=".pdf"
           />
-          <label
-            htmlFor="fileInput"
-            className="btn btn-outline-primary mt-3"
-          >
+          <label htmlFor="fileInput" className="btn btn-outline-primary mt-3">
             Chọn file
           </label>
         </div>
+        {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
         {file && !uploadComplete && (
           <div className="mb-3">
             <p>
-              File đã chọn: {file.name} (
-              {(file.size / 1024 / 1024).toFixed(2)} MB)
+              File đã chọn: {file.name} ({(file.size / 1024 / 1024).toFixed(2)}{" "}
+              MB)
             </p>
             {uploading ? (
-              <ProgressBar
-                animated
-                now={progress}
-                label={`${progress}%`}
-              />
+              <ProgressBar animated now={progress} label={`${progress}%`} />
             ) : (
               <Button
                 variant="primary"
