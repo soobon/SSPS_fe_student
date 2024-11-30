@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, Table, Form, Row, Col, Badge, Button } from "react-bootstrap";
-import { Calendar, Printer, FileText } from "react-feather";
+import { Printer, FileText } from "react-feather";
 import StudentHeader from "../../components/common/StudentHeader";
 import Footer from "../../components/common/Footer";
 import apiService from "../../services/api";
@@ -10,7 +10,7 @@ const HistoryPage = () => {
   const [endDate, setEndDate] = useState("");
   const [historyData, setHistoryData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  const userId = "012345678";
+  const userId = localStorage.getItem("id");
 
   useEffect(() => {
     apiService

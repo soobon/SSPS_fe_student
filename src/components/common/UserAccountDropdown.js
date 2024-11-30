@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { User, Settings, LogOut } from "react-feather";
+import { User, LogOut } from "react-feather";
 
 const UserAccountDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => setIsOpen(!isOpen);
-
+  const handleLogout = () => {
+    localStorage.clear();
+  };
   return (
     <div className="dropdown">
       <button
@@ -15,7 +17,6 @@ const UserAccountDropdown = () => {
         onClick={toggleDropdown}
       >
         <User size={18} className="me-2" />
-        <span>Nguyễn Văn A</span>
       </button>
       <ul className={`dropdown-menu${isOpen ? " show" : ""}`}>
         <li>
@@ -25,16 +26,14 @@ const UserAccountDropdown = () => {
           </Link>
         </li>
         <li>
-          <Link to="/settings" className="dropdown-item">
-            <Settings size={18} className="me-2" />
-            Cài đặt
-          </Link>
-        </li>
-        <li>
           <hr className="dropdown-divider" />
         </li>
         <li>
-          <Link to="/logout" className="dropdown-item text-danger">
+          <Link
+            to="/login"
+            className="dropdown-item text-danger"
+            onClick={() => handleLogout()}
+          >
             <LogOut size={18} className="me-2" />
             Đăng xuất
           </Link>

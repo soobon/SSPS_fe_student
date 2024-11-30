@@ -2,19 +2,28 @@ import axiosInstance from "../axios/axios";
 
 export const apiService = {
   getInfo: (ID) => axiosInstance.get("/student/info/" + ID),
-  getStatistic: (ID, month) =>
-    axiosInstance.get("/student/statistic/" + ID + "/" + month),
+  getStatistic: (ID, year) =>
+    axiosInstance.get("/student/statistic/" + ID + "/" + year),
   getFileList: (ID) => axiosInstance.get("/student/file_list/" + ID),
   getHistory: (ID) => axiosInstance.get("/student/history/" + ID),
 
-  addNewFile: (ID, file_name, num_pages) =>
-    axiosInstance.post("/student/newFile/" + ID, {
-      file_name,
-      num_pages,
-    }),
-
   deleteFile: (file_id) =>
     axiosInstance.delete("/student/deleteFile/" + file_id),
+  login: (username, password) =>
+    axiosInstance.post("/auth/authen", { username, password }),
+  getID: () => axiosInstance.get("/auth/userId"),
+  getAllPrinter: () => axiosInstance.get("/student/getAllPrinter"),
+  sendPrintRequest: (info) =>
+    axiosInstance.post(
+      "http://localhost:8080/student/printRequest/" +
+        localStorage.getItem("id"),
+      null,
+      {
+        params: {
+          ...info,
+        },
+      }
+    ),
 };
 
 export default apiService;

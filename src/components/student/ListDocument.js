@@ -12,7 +12,7 @@ const ListDocument = () => {
   const [selectedFileId, setSelectedFileId] = useState(null);
 
   useEffect(() => {
-    const userId = "012345678";
+    const userId = localStorage.getItem("id");
     apiService
       .getFileList(userId)
       .then((response) => {

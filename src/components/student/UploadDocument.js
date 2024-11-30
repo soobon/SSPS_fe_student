@@ -2,10 +2,11 @@ import React, { useState, useRef } from "react";
 import { Card, Form, Button, ProgressBar, Alert } from "react-bootstrap";
 import { Upload, File, CheckCircle } from "react-feather";
 import apiService from "../../services/api";
+import axios from "axios";
 
 const UploadDocument = () => {
-  const userId = "012345678";
-  const [file, setFile] = useState(null);
+  const userId = localStorage.getItem("id");
+  const [file, setFile] = useState();
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [uploadComplete, setUploadComplete] = useState(false);
@@ -38,6 +39,8 @@ const UploadDocument = () => {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
+    console.log(selectedFile);
+
     if (selectedFile && selectedFile.type === "application/pdf") {
       setFile(selectedFile);
       setUploadComplete(false);
@@ -50,6 +53,7 @@ const UploadDocument = () => {
   const handleDrop = (e) => {
     e.preventDefault();
     const selectedFile = e.dataTransfer.files[0];
+    console.log(selectedFile);
     if (selectedFile && selectedFile.type === "application/pdf") {
       setFile(selectedFile);
       setUploadComplete(false);
@@ -70,13 +74,46 @@ const UploadDocument = () => {
       setUploading(true);
       const pageCount = await getPageCount(file);
 
-      // Call API to add new file
-      await apiService.addNewFile(userId, file.name, pageCount);
+      const formData = new FormData();
+      formData.append("numpages", pageCount);
+      formData.append("file_name", file.name);
+      formData.append("file", file);
 
-      setProgress(100);
-      setUploadComplete(true);
-      window.location.reload();
-      
+      // Call API to add new file
+      // await apiService
+      //   .addNewFile(userId, formData)
+      //   .then((res) => {
+      //     console.log(res);
+      //     setProgress(100);
+      //     setUploadComplete(true);
+      //     // window.location.reload();
+      //   })
+      //   .catch((err) => {
+      //     // console.error(err);
+      //   });
+
+      axios
+        .post(
+          process.env.REACT_APP_API_URL +
+            "/student/newFile/" +
+            localStorage.getItem("id"),
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        )
+        .then((res) => {
+          console.log(res);
+          setProgress(100);
+          setUploadComplete(true);
+          window.location.reload();
+        })
+        .catch((err) => {
+          alert("Lỗi ròi !!!!!");
+        });
     } catch (error) {
       setErrorMessage(error.message || "Tải lên thất bại");
       setUploading(false);

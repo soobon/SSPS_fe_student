@@ -15,7 +15,7 @@ import {
 } from "recharts";
 import { Printer, FileText, CreditCard } from "react-feather";
 
-const Dashboard = ({ printStats, chartData, isLoadingStats }) => {
+const Dashboard = ({ printStats, chartData }) => {
   const COLORS = ["#0088FE", "#00C49F"];
 
   return (
@@ -69,20 +69,17 @@ const Dashboard = ({ printStats, chartData, isLoadingStats }) => {
           <Card className="shadow-sm">
             <Card.Body>
               <Card.Title>Lịch sử in theo tháng</Card.Title>
-              {isLoadingStats ? (
-                <p>Loading...</p>
-              ) : (
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="prints" fill="#8884d8" />
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
+
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="printing_count_for_this_month" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
             </Card.Body>
           </Card>
         </Col>

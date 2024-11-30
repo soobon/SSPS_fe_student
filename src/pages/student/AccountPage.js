@@ -6,7 +6,7 @@ import Footer from "../../components/common/Footer";
 import apiService from "../../services/api";
 
 const AccountPage = () => {
-  const userId = "012345678";
+  const userId = localStorage.getItem("id");
 
   // Mock user data
   const [user, setUser] = useState({

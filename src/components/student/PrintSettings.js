@@ -1,25 +1,44 @@
-import React, { useState } from "react";
-import { Card, Form, Alert } from "react-bootstrap";
-import { Printer, FileText, DollarSign } from "react-feather";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { Card, Form } from "react-bootstrap";
+import { Printer, FileText } from "react-feather";
+import apiService from "../../services/api";
 
 const PrintSettings = ({ onPrintConfirm }) => {
+  const { id } = useParams();
   const [printer, setPrinter] = useState("");
   const [paperSize, setPaperSize] = useState("A4");
-  const [printPages, setPrintPages] = useState("");
-  const [printSides, setPrintSides] = useState("one-sided");
+  const [printPages, setPrintPages] = useState("-1");
+  const [printSides, setPrintSides] = useState("1");
   const [copies, setCopies] = useState(1);
+  const [allPrinters, setAllPrinters] = useState([]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onPrintConfirm({
-      printer,
-      paperSize,
-      printPages,
-      printSides,
-      copies,
+      start_page: -1,
+      end_page: -1,
+      list_page: printPages,
+      printer_id: printer,
+      file_id: id,
+      paper_size: paperSize,
+      one_or_two_side: printSides,
+      nb_of_copy: copies,
     });
+    console.log();
   };
 
+  useEffect(() => {
+    apiService
+      .getAllPrinter()
+      .then((res) => {
+        console.log(res);
+        setAllPrinters(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
   return (
     <Form id="print-settings-form" onSubmit={handleSubmit}>
       <Card className="shadow-sm mb-4">
@@ -35,26 +54,14 @@ const PrintSettings = ({ onPrintConfirm }) => {
             required
           >
             <option value="">Chọn máy in</option>
-            <option value="Máy in 1 - Vị trí A">Máy in 1 - Vị trí A</option>
-            <option value="Máy in 2 - Vị trí B">Máy in 2 - Vị trí B</option>
-            <option value="Máy in 3 - Vị trí C">Máy in 3 - Vị trí C</option>
+            {allPrinters.map((printer, index) => {
+              return (
+                <option value={printer.printer_id} key={index}>
+                  {printer.model} - {printer.building}
+                </option>
+              );
+            })}
           </Form.Select>
-          {printer && (
-            <Alert variant="info">
-              <p className="mb-1">
-                <strong>ID:</strong> 001
-              </p>
-              <p className="mb-1">
-                <strong>Hãng:</strong> HP
-              </p>
-              <p className="mb-1">
-                <strong>Model:</strong> LaserJet Pro
-              </p>
-              <p className="mb-0">
-                <strong>Vị trí:</strong> Phòng 101
-              </p>
-            </Alert>
-          )}
         </Card.Body>
       </Card>
 
@@ -75,10 +82,10 @@ const PrintSettings = ({ onPrintConfirm }) => {
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Số trang cần in</Form.Label>
+            <Form.Label>Số trang cần in (Tất cả = -1)</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Tất cả hoặc chọn range (vd: 1-5, 8, 11-13)"
+              placeholder="Tất cả hoặc chọn range (vd: 1,3,4,6,8...)"
               value={printPages}
               onChange={(e) => setPrintPages(e.target.value)}
             />
@@ -89,8 +96,8 @@ const PrintSettings = ({ onPrintConfirm }) => {
               value={printSides}
               onChange={(e) => setPrintSides(e.target.value)}
             >
-              <option value="one-sided">Một mặt</option>
-              <option value="two-sided">Hai mặt</option>
+              <option value="1">Một mặt</option>
+              <option value="2">Hai mặt</option>
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3">
@@ -102,19 +109,6 @@ const PrintSettings = ({ onPrintConfirm }) => {
               min="1"
             />
           </Form.Group>
-        </Card.Body>
-      </Card>
-
-      <Card className="shadow-sm mb-4">
-        <Card.Body>
-          <h2 className="h5 mb-3">
-            <DollarSign className="me-2" size={20} />
-            Xem trước chi phí in
-          </h2>
-          <p className="mb-0">
-            <strong>Số trang sẽ bị trừ:</strong>{" "}
-            {copies * (printPages ? printPages.split(",").length : 1)}
-          </p>
         </Card.Body>
       </Card>
     </Form>
