@@ -30,6 +30,11 @@ export const apiService = {
         nb_of_page,
       },
     }),
+  deleteRequest: (order_num, file_id) => {
+    const api =
+      "/student/deleteRequest?order_num=" + order_num + "&file_id=" + file_id;
+    axiosInstance.delete(api);
+  },
 };
 
 export default apiService;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, Table, Form, Row, Col, Badge, Button } from "react-bootstrap";
-import { Printer, FileText } from "react-feather";
+import { Printer, FileText, Trash } from "react-feather";
 import StudentHeader from "../../components/common/StudentHeader";
 import Footer from "../../components/common/Footer";
 import apiService from "../../services/api";
@@ -105,6 +105,7 @@ const HistoryPage = () => {
                 <th>Tài liệu</th>
                 <th>Số trang</th>
                 <th>Trạng thái</th>
+                <th>Xóa</th>
               </tr>
             </thead>
             <tbody>
@@ -123,6 +124,26 @@ const HistoryPage = () => {
                     <Badge bg={+item.statuss == 2 ? "success" : "danger"}>
                       {item.statuss}
                     </Badge>
+                  </td>
+                  <td>
+                    <button
+                      className="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center"
+                      onClick={() => {
+                        try {
+                          apiService.deleteRequest(
+                            item.order_num,
+                            item.file_id
+                          );
+                          window.location.reload();
+                        } catch (err) {
+                          alert("Lỗi ròi !!!!!!!");
+                          console.error(err);
+                        }
+                      }}
+                      title="Xóa tài liệu"
+                    >
+                      <Trash size={15} />
+                    </button>
                   </td>
                 </tr>
               ))}
