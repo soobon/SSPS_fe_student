@@ -12,12 +12,14 @@ const PrintSettings = ({ onPrintConfirm }) => {
   const [printSides, setPrintSides] = useState("1");
   const [copies, setCopies] = useState(1);
   const [allPrinters, setAllPrinters] = useState([]);
+  const [startPage, setStartPage] = useState("-1");
+  const [endPage, setEndPage] = useState("-1");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onPrintConfirm({
-      start_page: -1,
-      end_page: -1,
+      start_page: startPage,
+      end_page: endPage,
       list_page: printPages,
       printer_id: printer,
       file_id: id,
@@ -25,14 +27,14 @@ const PrintSettings = ({ onPrintConfirm }) => {
       one_or_two_side: printSides,
       nb_of_copy: copies,
     });
-    console.log();
+    // console.log();
   };
 
   useEffect(() => {
     apiService
       .getAllPrinter()
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         setAllPrinters(res.data);
       })
       .catch((err) => {
@@ -82,12 +84,46 @@ const PrintSettings = ({ onPrintConfirm }) => {
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Số trang cần in (Tất cả = -1)</Form.Label>
+            <Form.Label>Trang bắt đầu</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Tất cả hoặc chọn range (vd: 1,3,4,6,8...)"
-              value={printPages}
-              onChange={(e) => setPrintPages(e.target.value)}
+              placeholder="Để trống hoặc chọn số (vd: 8)"
+              value={startPage == -1 ? "" : startPage}
+              onChange={(e) => {
+                if (e.target.value) {
+                  setStartPage(e.target.value);
+                } else setStartPage(-1);
+              }}
+              disabled={printPages != "-1"}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Trang kết thúc</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Để trống hoặc chọn số (vd: 16)"
+              value={endPage == -1 ? "" : endPage}
+              onChange={(e) => {
+                if (e.target.value) {
+                  setEndPage(e.target.value);
+                } else setEndPage(-1);
+              }}
+              disabled={printPages != "-1"}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Số trang cần in</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Để trống hoặc chọn range (vd: 1,3,4,6,8...)"
+              value={printPages == -1 ? "" : printPages}
+              onChange={(e) => {
+                if (e.target.value) {
+                  setPrintPages(e.target.value);
+                } else setPrintPages(-1);
+                // console.log(e.target.value);
+              }}
+              disabled={endPage != "-1" || startPage != "-1"}
             />
           </Form.Group>
           <Form.Group className="mb-3">

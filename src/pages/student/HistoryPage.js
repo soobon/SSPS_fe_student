@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Card, Table, Form, Row, Col, Badge, Button } from "react-bootstrap";
-import { Printer, FileText, Trash } from "react-feather";
+import {
+  Card,
+  Table,
+  Form,
+  Row,
+  Col,
+  Badge,
+  Button,
+  Modal,
+} from "react-bootstrap";
+import { Printer, FileText, Trash, Home } from "react-feather";
 import StudentHeader from "../../components/common/StudentHeader";
 import Footer from "../../components/common/Footer";
 import apiService from "../../services/api";
@@ -10,6 +19,21 @@ const HistoryPage = () => {
   const [endDate, setEndDate] = useState("");
   const [historyData, setHistoryData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+  const [selectedItem, setSelectedItem] = useState({
+    id: "123456789",
+    file_name: "rp.pdf",
+    nb_of_page_used: 15,
+    statuss: 0,
+    print_date: "2024-12-01",
+    building: "Building I",
+    print_id: "P00000009",
+    file_id: "F9446770170",
+    order_num: 2,
+  });
+
   const userId = localStorage.getItem("id");
 
   useEffect(() => {
@@ -52,6 +76,18 @@ const HistoryPage = () => {
     setStartDate("");
     setEndDate("");
     setFilteredData(historyData);
+  };
+
+  const confirmDelete = () => {
+    apiService
+      .deleteRequest(selectedItem.order_num, selectedItem.file_id)
+      .then(() => {
+        window.location.reload();
+      })
+      .catch((err) => {
+        alert("Lỗi ròi !!!!!!!");
+        console.error(err);
+      });
   };
 
   return (
@@ -110,7 +146,13 @@ const HistoryPage = () => {
             </thead>
             <tbody>
               {filteredData.map((item) => (
-                <tr key={item.id}>
+                <tr
+                  key={item.id}
+                  onClick={() => {
+                    setSelectedItem(item);
+                    setShowInfo(true);
+                  }}
+                >
                   <td>{item.print_date}</td>
                   <td>
                     <FileText size={18} className="me-2" />
@@ -128,17 +170,10 @@ const HistoryPage = () => {
                   <td>
                     <button
                       className="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center"
-                      onClick={() => {
-                        try {
-                          apiService.deleteRequest(
-                            item.order_num,
-                            item.file_id
-                          );
-                          window.location.reload();
-                        } catch (err) {
-                          alert("Lỗi ròi !!!!!!!");
-                          console.error(err);
-                        }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowDeleteModal(true);
+                        setSelectedItem(item);
                       }}
                       title="Xóa tài liệu"
                     >
@@ -149,6 +184,78 @@ const HistoryPage = () => {
               ))}
             </tbody>
           </Table>
+          <Modal
+            show={showDeleteModal}
+            onHide={() => setShowDeleteModal(false)}
+            centered
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Xác nhận xóa</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>Bạn có chắc chắn muốn xóa tài liệu này?</Modal.Body>
+            <Modal.Footer>
+              <Button
+                variant="secondary"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Hủy
+              </Button>
+              <Button variant="danger" onClick={confirmDelete}>
+                Xóa
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal show={showInfo} onHide={() => setShowInfo(false)} centered>
+            <Modal.Header closeButton>
+              <Modal.Title>Thông tin yêu cầu</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <div className="d-flex flex-column gap-3">
+                <div className="d-flex align-items-center">
+                  <FileText size={24} className="me-3 text-primary" />
+                  <div>
+                    <strong>Tên file:</strong> {selectedItem.file_name}
+                  </div>
+                </div>
+
+                <div className="d-flex align-items-center">
+                  <Printer size={24} className="me-3 text-primary" />
+                  <div>
+                    <strong>Số trang:</strong>{" "}
+                    {selectedItem.nb_of_page_used}
+                  </div>
+                </div>
+
+                <div className="d-flex align-items-center">
+                  <Home size={24} className="me-3 text-primary" />
+                  <div>
+                    <strong>Vị trí:</strong> {selectedItem.building}
+                  </div>
+                </div>
+
+                <div className="d-flex align-items-center">
+                  <strong className="me-3">Print ID:</strong>
+                  {selectedItem.print_id}
+                </div>
+
+                <div className="d-flex align-items-center">
+                  <strong className="me-3">File ID:</strong>
+                  {selectedItem.file_id}
+                </div>
+
+                <div className="d-flex align-items-center">
+                  <strong className="me-3">Số thứ tự:</strong>
+                  {selectedItem.order_num}
+                </div>
+
+                <div className="d-flex align-items-center">
+                  <strong className="me-3">Ngày:</strong>
+                  {selectedItem.print_date}
+                </div>
+              </div>
+            </Modal.Body>
+          </Modal>
         </div>
       </main>
       <Footer />
