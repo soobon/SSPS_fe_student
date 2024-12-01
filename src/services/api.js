@@ -15,8 +15,7 @@ export const apiService = {
   getAllPrinter: () => axiosInstance.get("/student/getAllPrinter"),
   sendPrintRequest: (info) =>
     axiosInstance.post(
-      "http://localhost:8080/student/printRequest/" +
-        localStorage.getItem("id"),
+      "/student/printRequest/" + localStorage.getItem("id"),
       null,
       {
         params: {
