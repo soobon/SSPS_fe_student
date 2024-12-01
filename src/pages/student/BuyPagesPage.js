@@ -3,15 +3,24 @@ import { Card, Form, Button, Alert } from "react-bootstrap";
 import { ShoppingCart } from "react-feather";
 import StudentHeader from "../../components/common/StudentHeader";
 import Footer from "../../components/common/Footer";
+import apiService from "../../services/api";
 
 const BuyPagesPage = () => {
   const [pagesToBuy, setPagesToBuy] = useState(10);
-  const [paymentMethod, setPaymentMethod] = useState("BKPay");
+  const [paymentMethod] = useState("BKPay");
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const handlePurchase = (e) => {
     e.preventDefault();
-    setShowConfirmation(true);
+    apiService
+      .updatePageAfterBuy(localStorage.getItem("id"), pagesToBuy)
+      .then((res) => {
+        console.log(res);
+        setShowConfirmation(true);
+      })
+      .catch(() => {
+        alert("Lỗi ròi !!!!!!!!!");
+      });
   };
 
   return (
@@ -23,14 +32,6 @@ const BuyPagesPage = () => {
           <Card className="shadow-sm">
             <Card.Body>
               <Form onSubmit={handlePurchase}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Số dư hiện tại</Form.Label>
-                  <Card className="bg-light">
-                    <Card.Body>
-                      <p className="mb-0">A4: 100 trang | A3: 50 trang</p>
-                    </Card.Body>
-                  </Card>
-                </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Số lượng trang muốn mua (A4)</Form.Label>
                   <Form.Control
@@ -58,21 +59,15 @@ const BuyPagesPage = () => {
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Phương thức thanh toán</Form.Label>
-                  <Form.Select
-                    value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  >
+                  <Form.Select value={paymentMethod}>
                     <option value="BKPay">BKPay</option>
-                    <option value="MoMo">MoMo</option>
-                    <option value="ZaloPay">ZaloPay</option>
                   </Form.Select>
                 </Form.Group>
-                <div className="d-flex justify-content-between">
+                <div className="d-flex justify-content-end">
                   <Button variant="primary" type="submit">
                     <ShoppingCart className="me-2" />
                     Thanh toán
                   </Button>
-                  <Button variant="outline-secondary">Hủy</Button>
                 </div>
               </Form>
               {showConfirmation && (

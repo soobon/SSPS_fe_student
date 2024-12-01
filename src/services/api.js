@@ -24,6 +24,13 @@ export const apiService = {
         },
       }
     ),
+  updatePageAfterBuy: (std_id, nb_of_page) =>
+    axiosInstance.put("/payment", null, {
+      params: {
+        std_id,
+        nb_of_page,
+      },
+    }),
 };
 
 export default apiService;
