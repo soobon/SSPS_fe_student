@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import apiService from "../../services/api";
-import { Route } from "react-router";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -18,16 +17,8 @@ const LoginPage = () => {
           // console.log(res.data);
           localStorage.setItem("token", res.data.token);
           localStorage.setItem("isAuth", true);
-          apiService
-            .getID()
-            .then((res) => {
-              // console.log(res);
-              localStorage.setItem("id", res.data);
-            })
-            .catch((err) => {
-              console.error(err);
-            });
-          navigate("/");
+          localStorage.setItem("id", res.data.user_id);
+          window.location.reload();
         } else {
           alert(res.data.response);
         }

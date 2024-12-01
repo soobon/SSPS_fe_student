@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { User, LogOut } from "react-feather";
 
 const UserAccountDropdown = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => setIsOpen(!isOpen);
   const handleLogout = () => {
     localStorage.clear();
+    window.location.reload();
+
   };
   return (
     <div className="dropdown">
@@ -30,7 +33,7 @@ const UserAccountDropdown = () => {
         </li>
         <li>
           <Link
-            to="/login"
+            to="#"
             className="dropdown-item text-danger"
             onClick={() => handleLogout()}
           >
