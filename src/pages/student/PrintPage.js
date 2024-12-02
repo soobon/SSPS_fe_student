@@ -57,7 +57,7 @@ const PrintPage = () => {
           {printConfirmed && (
             <Alert variant="success" className="mt-4">
               <h4 className="alert-heading">Đã xác nhận in thành công!</h4>
-              <p>Vui lòng đến máy in đã chọn để lấy tài liệu của bạn.</p>
+              <p>Bạn đã gửi yêu cầu in thành công.</p>
               <hr />
               <Button variant="link" className="p-0 mt-3" onClick={handleReset}>
                 Về trang chủ
