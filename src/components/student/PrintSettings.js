@@ -57,6 +57,7 @@ const PrintSettings = ({ onPrintConfirm }) => {
           >
             <option value="">Chọn máy in</option>
             {allPrinters.map((printer, index) => {
+              if (printer.state == 0) return <></>;
               return (
                 <option value={printer.printer_id} key={index}>
                   {printer.model} - {printer.building}
