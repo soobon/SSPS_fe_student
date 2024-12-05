@@ -47,10 +47,10 @@ jobs:
           name: react-build
       
       - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
         with:
-          app-name: 'studentspss'
+          app-name: 'spssstudentfe'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AEFDEA7FA7B84E1D8712DECA0463CC22 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5B4E0896D581458399AA566D5A5F4E00 }}
