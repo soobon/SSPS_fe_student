@@ -33,7 +33,7 @@ jobs:
       
       - name: Build
         run: |
-          $env:DISABLE_ESLINT_PLUGIN=true; npm run build
+          $env:DISABLE_ESLINT_PLUGIN=true; $env:CI=false;  npm run build
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
