@@ -1,4 +1,7 @@
-name: Build and deploy React static site to Azure Web App
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy Node.js app to Azure Web App - studentspss
 
 on:
   push:
@@ -8,7 +11,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -18,20 +21,17 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: Install Dependencies
+      - name: npm install, build, and test
         run: |
-          npm ci
-          npm install @babel/plugin-proposal-private-property-in-object --save-dev
-      
-      - name: Build
-        run: |
-          CI=false DISABLE_ESLINT_PLUGIN=true npm run build
+          npm install
+          npm run build --if-present
+          npm run test --if-present
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: react-build
-          path: build  # Chỉ upload thư mục build
+          name: node-app
+          path: .
 
   deploy:
     runs-on: ubuntu-latest
@@ -44,7 +44,7 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: react-build
+          name: node-app
       
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
@@ -53,4 +53,4 @@ jobs:
           app-name: 'studentspss'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AEFDEA7FA7B84E1D8712DECA0463CC22 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5B4E0896D581458399AA566D5A5F4E00 }}
