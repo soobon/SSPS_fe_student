@@ -25,5 +25,5 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'spssstudentfe'
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_982e2bcdd94340bbbeb1711c33a5a017 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_982E2BCDD94340BBBEB1711C33A5A017 }}
           package: '.'
