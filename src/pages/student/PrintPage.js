@@ -21,6 +21,7 @@ const PrintPage = () => {
         console.log(err);
         alert("Lỗi rồi!!!!");
       });
+      apiService.sendMail();
   };
   const handleReset = () => {
     navigate("/");
