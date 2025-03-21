@@ -34,8 +34,8 @@ export const apiService = {
     axiosInstance.delete(
       `/student/deleteRequest?order_num=${order_num}&file_id=${file_id}`
     ),
-    sendMail: () =>
-      axiosInstance.post(`/mail/${localStorage.getItem("id")}`),
+  sendMail: () =>
+    axiosInstance.post(`/mail/${localStorage.getItem("id")}`),
 };
 
 export default apiService;

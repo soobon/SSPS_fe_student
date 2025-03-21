@@ -17,11 +17,16 @@ const BuyPagesPage = () => {
       .then((res) => {
         console.log(res);
         setShowConfirmation(true);
+        if (res.data) {
+          window.location.href = res.data; // Chuyển hướng đến URL thanh toán
+        } else {
+          alert("Không nhận được URL thanh toán!");
+        }
       })
       .catch(() => {
         alert("Lỗi ròi !!!!!!!!!");
       });
-  };
+};
 
   return (
     <div className="d-flex flex-column min-vh-100">
