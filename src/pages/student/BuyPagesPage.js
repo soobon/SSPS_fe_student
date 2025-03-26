@@ -6,7 +6,7 @@ import Footer from "../../components/common/Footer";
 import apiService from "../../services/api";
 
 const BuyPagesPage = () => {
-  const [pagesToBuy, setPagesToBuy] = useState(10);
+  const [pagesToBuy, setPagesToBuy] = useState(20);
   const [paymentMethod] = useState("BKPay");
   const [showConfirmation, setShowConfirmation] = useState(false);
 
